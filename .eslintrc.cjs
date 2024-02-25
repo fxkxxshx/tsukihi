@@ -36,6 +36,7 @@ module.exports = {
   settings: {
     tailwindcss: {
       groupByResponsive: true,
+      whitelist: ['^swiper(?:-[a-zA-Z]+)*$'],
     },
   },
 };

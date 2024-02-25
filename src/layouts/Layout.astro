@@ -1,64 +1,54 @@
 ---
+import Head from '@/components/common/Head.astro';
+import Logo from '@/components/common/Logo.astro';
+import Menu from '@/components/common/Menu.astro';
+
 interface Props {
-  title: string;
+  pageTitle?: string;
+  pageDescription?: string;
+  pageOgType?: string;
+  pageSlug?: string;
+  index?: number;
 }
 
-const { title } = Astro.props;
+const { pageTitle, pageDescription, pageOgType, pageSlug, index } = Astro.props;
+
+const defaultTitle = 'TSUKIHI';
+const defaultDescription =
+  'TSUKIHIは不可意思が撮った写真を掲載するギャラリーサイトです。';
+const defaultOgType = 'website';
+const defaultUrl = 'https://tsukihi.fkxsh.com';
+
+const title = pageTitle ? `${pageTitle} | ${defaultTitle}` : defaultTitle;
+const description = pageDescription ? pageDescription : defaultDescription;
+const ogType = pageOgType ? pageOgType : defaultOgType;
+const url = pageSlug ? `${defaultUrl}/${pageSlug}` : defaultUrl;
 ---
 
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="description"
-      content="Astro description"
-    />
-    <meta
-      name="viewport"
-      content="width=device-width"
-    />
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="/favicon.svg"
-    />
-    <meta
-      name="generator"
-      content={Astro.generator}
-    />
-    <title>{title}</title>
-  </head>
-  <body>
-    <slot />
+<html
+  lang="ja"
+  transition:animate="fade"
+>
+  <Head
+    title={title}
+    description={description}
+    ogType={ogType}
+    url={url}
+    defaultTitle={defaultTitle}
+    defaultUrl={defaultUrl}
+  />
+  <body
+    class="group/menu font-tsukihiEN text-white"
+    data-open="close"
+    data-index={typeof index === 'number' ? index : false}
+  >
+    <header>
+      <Logo />
+    </header>
+    <main class="bg-tsukihi-black">
+      <slot />
+    </main>
+    <Menu />
   </body>
 </html>
-<style is:global>
-  :root {
-    --accent: 136, 58, 234;
-    --accent-light: 224, 204, 250;
-    --accent-dark: 49, 10, 101;
-    --accent-gradient: linear-gradient(
-      45deg,
-      rgb(var(--accent)),
-      rgb(var(--accent-light)) 30%,
-      white 60%
-    );
-  }
-  html {
-    font-family: system-ui, sans-serif;
-    background: #13151a;
-    background-size: 224px;
-  }
-  code {
-    font-family:
-      Menlo,
-      Monaco,
-      Lucida Console,
-      Liberation Mono,
-      DejaVu Sans Mono,
-      Bitstream Vera Sans Mono,
-      Courier New,
-      monospace;
-  }
-</style>

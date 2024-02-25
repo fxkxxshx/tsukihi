@@ -1,0 +1,81 @@
+---
+import SliderItem from '@/components/index/SliderItem.astro';
+import { places } from '@/data/places';
+---
+
+<div class="swiper">
+  <div class="swiper-wrapper">
+    {places.map((place) => <SliderItem place={place} />)}
+  </div>
+  <nav
+    class="absolute bottom-[40px] left-[24px] z-10 flex items-center gap-[28px] lg:bottom-[44px] lg:left-[44px]"
+  >
+    <button
+      class="swiper-button-prev-custom relative text-[20px] leading-none before:absolute before:inset-[-16px] before:box-content before:p-[16px]"
+      type="button"
+      aria-label="左に1つスライダーを移動する"
+    >
+      ←
+    </button>
+    <div
+      class="swiper-pagination !relative !bottom-0 flex gap-[8px] text-[16px] leading-none"
+    >
+    </div>
+    <button
+      class="swiper-button-next-custom relative text-[20px] leading-none before:absolute before:inset-[-16px] before:box-content before:p-[16px]"
+      type="button"
+      aria-label="右に1つスライダーを移動する"
+    >
+      →
+    </button>
+  </nav>
+</div>
+
+<script>
+  import 'swiper/css/bundle';
+
+  import Swiper from 'swiper/bundle';
+
+  let swiperIndex = '0';
+
+  const swiperInit = () => {
+    const swiper = new Swiper('.swiper', {
+      init: false,
+      loop: true,
+      grabCursor: true,
+      effect: 'creative',
+      initialSlide: Number(swiperIndex),
+      creativeEffect: {
+        prev: {
+          shadow: true,
+          translate: ['-10%', 0, -1],
+        },
+        next: {
+          translate: ['100%', 0, 0],
+        },
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        type: 'fraction',
+      },
+      navigation: {
+        nextEl: '.swiper-button-next-custom',
+        prevEl: '.swiper-button-prev-custom',
+      },
+      on: {
+        slideChangeTransitionEnd: () => {
+          swiperIndex = String(swiper.realIndex);
+        },
+      },
+    });
+
+    swiper.init();
+  };
+
+  document.addEventListener('astro:page-load', () => {
+    if (document.querySelector('.swiper')) {
+      swiperIndex = sessionStorage.getItem('sliderIndex') || '0';
+      swiperInit();
+    }
+  });
+</script>

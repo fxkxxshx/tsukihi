@@ -1,0 +1,54 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+import type { PlaceType } from '@/types/place';
+
+interface Props {
+  place: PlaceType;
+}
+
+const { place } = Astro.props;
+
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/img/*/thumb.{jpeg,jpg,png,gif}',
+);
+---
+
+<article class="swiper-slide !h-[100dvh] w-full">
+  <Image
+    class="size-full object-cover"
+    src={images[`/src/assets/img/${place.slug}/thumb.jpg`]()}
+    alt=""
+    loading="eager"
+    quality="high"
+    transition:name={`thumb-${place.slug}`}
+  />
+  <div
+    class="absolute left-[24px] top-[40px] flex flex-col items-start gap-[28px] lg:left-[44px] lg:top-[44px] lg:gap-[40px]"
+  >
+    <header class="flex flex-col gap-[20px] lg:gap-[24px]">
+      <h2
+        class="text-[64px] leading-[calc(44/64)] lg:hidden"
+        set:html={place.titleSP}
+      />
+      <h2
+        class="hidden text-[148px] leading-[calc(104/148)] lg:block"
+        set:html={place.titlePC}
+      />
+      <time
+        class="text-[16px] leading-none tracking-[0.08em] lg:text-[20px]"
+        datetime={place.date}
+      >
+        {place.date}
+      </time>
+    </header>
+    <a
+      class="box-border flex items-center gap-[15px] rounded-[9999px] border-[2px] border-white py-[14px] pl-[30px] pr-[22px] text-[20px] leading-none lg:gap-[15px] lg:py-[16px] lg:pl-[48px] lg:pr-[28px] lg:text-[28px]"
+      href={`/${place.slug}`}
+    >
+      <span>MORE</span>
+      <span>→</span>
+    </a>
+  </div>
+</article>

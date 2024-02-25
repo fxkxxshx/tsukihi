@@ -1,0 +1,92 @@
+---
+import { places } from '@/data/places';
+---
+
+<button
+  class="fixed right-[24px] top-[40px] z-10 h-[16px] w-[16px] rounded-[50%] bg-white before:absolute before:inset-[-16px] before:box-content before:p-[16px] group-data-[open=open]/menu:bg-tsukihi-black lg:right-[44px] lg:top-[44px] lg:h-[20px] lg:w-[20px]"
+  id="menu-button"
+  type="button"
+  aria-label="メニューを開く"
+></button>
+<div
+  class="fixed left-0 top-0 z-[1] hidden h-full w-full overflow-y-scroll bg-white text-tsukihi-black group-data-[open=open]/menu:block"
+>
+  <div
+    class="mx-auto flex w-full flex-col gap-[100px] px-[24px] pb-[40px] pt-[100px] lg:box-content lg:max-w-[1040px] lg:gap-[180px] lg:px-[44px] lg:pb-[44px] lg:pt-[180px]"
+  >
+    <nav>
+      <ol class="flex flex-col gap-[40px] lg:gap-[80px]">
+        {
+          places.map((place, index) => (
+            <li class="flex flex-col gap-[20px] overflow-hidden lg:gap-[36px]">
+              <span class="flex items-center gap-[8px] lg:gap-[12px]">
+                <span class="text-[12px] leading-none lg:text-[16px]">
+                  {('00' + String(index + 1)).slice(-2)}
+                </span>
+                <span class="block h-[2px] w-full bg-tsukihi-black" />
+              </span>
+              <a
+                class=""
+                href={`/${place.slug}`}
+              >
+                <span
+                  class="inline-block text-[64px] leading-[calc(44/64)] lg:hidden"
+                  set:html={place.titleSP}
+                />
+                <span
+                  class="hidden text-[148px] leading-[calc(104/148)] lg:inline-block"
+                  set:html={place.titlePC}
+                />
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <p
+      class="text-center text-[40px] leading-none text-white [-webkit-text-stroke:0.5px_#1f1f1f] [text-stroke:0.5px_#1f1f1f] lg:text-[100px] lg:[-webkit-text-stroke:1px_#1f1f1f] lg:[text-stroke:1px_#1f1f1f]"
+    >
+      TSUKIHI
+      <br />is a photo
+      <br />gallery site
+      <br />created by
+      <br />fkxsh.
+    </p>
+    <footer>
+      <p class="text-[12px] leading-none lg:text-center">&copy; 2024 fkxsh.</p>
+    </footer>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const body = document.querySelector<HTMLElement>('body');
+    const button = document.querySelector<HTMLElement>('#menu-button');
+
+    let scrollY = 0;
+
+    button?.addEventListener('click', () => {
+      const currentPath = location.pathname;
+
+      if (body) {
+        if (body.dataset.open === 'close') {
+          body.dataset.open = 'open';
+
+          if (currentPath !== '/') {
+            scrollY = window.scrollY;
+            body.style.position = 'fixed';
+            body.style.top = `${-scrollY}px`;
+          }
+        } else {
+          body.dataset.open = 'close';
+
+          if (currentPath !== '/') {
+            body.style.position = 'relative';
+            body.style.top = '0';
+            window.scrollTo(0, scrollY);
+          }
+        }
+      }
+    });
+  });
+</script>

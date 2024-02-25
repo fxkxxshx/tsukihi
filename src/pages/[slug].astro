@@ -1,0 +1,164 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
+import { places } from '@/data/places';
+import Layout from '@/layouts/Layout.astro';
+import type { PlaceType } from '@/types/place';
+
+interface Props {
+  place: PlaceType;
+  index: number;
+}
+
+export function getStaticPaths() {
+  return places.map((place, index) => {
+    return {
+      params: { slug: place.slug },
+      props: { place, index },
+    };
+  });
+}
+
+const { slug } = Astro.params;
+const { place, index } = Astro.props;
+
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/img/*/*.{jpeg,jpg,png,gif}',
+);
+---
+
+<Layout
+  pageTitle={place.title}
+  pageOgType="article"
+  pageSlug={slug}
+  index={index}
+>
+  <section class="relative h-[100svh] w-full">
+    <Image
+      class="size-full object-cover saturate-0"
+      src={images[`/src/assets/img/${place.slug}/thumb.jpg`]()}
+      alt=""
+      quality="high"
+      transition:name={`thumb-${place.slug}`}
+    />
+    <header
+      class="absolute left-0 top-0 flex h-full w-full items-center justify-center"
+    >
+      <h2
+        class="text-[64px] leading-[calc(44/64)] lg:hidden"
+        set:html={place.titleSP}
+      />
+      <h2
+        class="hidden text-[148px] leading-[calc(104/148)] lg:block"
+        set:html={place.titlePC}
+      />
+    </header>
+    <div
+      class="absolute bottom-[40px] left-[24px] lg:bottom-[44px] lg:left-[44px]"
+    >
+      <a
+        class="box-border flex items-center gap-[5px] rounded-[9999px] border-[1px] border-white py-[7px] pl-[11px] pr-[15px] text-[12px] leading-none lg:py-[9px] lg:pl-[15px] lg:pr-[19px]"
+        href="#contents"
+      >
+        <span>↓</span>
+        <span>SCROLL</span>
+      </a>
+    </div>
+  </section>
+  <div
+    class="mx-auto flex w-full flex-col items-center gap-[100px] px-[24px] py-[100px] lg:box-content lg:max-w-[1040px] lg:gap-[180px] lg:px-[44px] lg:py-[180px]"
+    id="contents"
+  >
+    <div class="flex w-full flex-col gap-[28px] font-tsukihiJA lg:gap-[32px]">
+      <div class="text-[16px] leading-[2] tracking-[0.04em] lg:text-[20px]">
+        <p
+          class="inline bg-white py-[2px] text-tsukihi-black"
+          set:html={place.text}
+        />
+      </div>
+      <ul
+        class="flex flex-col flex-wrap gap-[12px] text-[12px] leading-none tracking-[0.08em] lg:flex-row lg:gap-[20px]"
+      >
+        {place.tags.map((tag) => <li>#{tag}</li>)}
+      </ul>
+    </div>
+    <ul class="flex flex-col gap-[40px] lg:gap-[100px]">
+      {
+        Array.from({ length: place.imgLength }).map((_, index) => (
+          <li>
+            <Image
+              src={images[
+                `/src/assets/img/${place.slug}/img${index + 1}.jpg`
+              ]()}
+              alt=""
+              quality="high"
+            />
+          </li>
+        ))
+      }
+    </ul>
+    <a
+      class="box-border flex items-center gap-[15px] rounded-[9999px] border-[2px] border-white bg-white py-[14px] pl-[22px] pr-[30px] text-[20px] leading-none text-tsukihi-black lg:gap-[15px] lg:py-[16px] lg:pl-[28px] lg:pr-[48px] lg:text-[28px]"
+      href="/"
+    >
+      <span>←</span>
+      <span>BACK TO HOME</span>
+    </a>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const body = document.querySelector<HTMLElement>('body');
+    const currentPath = location.pathname;
+
+    if (body && currentPath !== '/') {
+      sessionStorage.setItem('sliderIndex', String(body.dataset.index));
+    }
+
+    const easing = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    const duration = 600;
+    const headerHeight = 0;
+    const triggers = document.querySelectorAll('a[href^="#"]');
+
+    triggers.forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const href = item.getAttribute('href');
+        const currentPosition =
+          document.documentElement.scrollTop || document.body.scrollTop;
+        const targetElement =
+          href && document.getElementById(href.replace('#', ''));
+
+        if (targetElement) {
+          const targetPosition =
+            window.scrollY +
+            targetElement.getBoundingClientRect().top -
+            headerHeight;
+          const startTime = window.performance.now();
+
+          const loop = (nowTime: number) => {
+            const time = nowTime - startTime;
+            const normalizedTime = time / duration;
+            if (normalizedTime < 1) {
+              window.scrollTo(
+                0,
+                currentPosition +
+                  (targetPosition - currentPosition) * easing(normalizedTime),
+              );
+              window.requestAnimationFrame(loop);
+            } else {
+              window.scrollTo(0, targetPosition);
+            }
+          };
+
+          window.requestAnimationFrame(loop);
+        }
+      });
+    });
+  });
+</script>
