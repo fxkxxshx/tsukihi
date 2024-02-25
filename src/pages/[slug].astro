@@ -39,7 +39,6 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
       class="size-full object-cover saturate-0"
       src={images[`/src/assets/img/${place.slug}/thumb.jpg`]()}
       alt=""
-      quality="high"
       transition:name={`thumb-${place.slug}`}
     />
     <header
@@ -92,7 +91,6 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
                 `/src/assets/img/${place.slug}/img${index + 1}.jpg`
               ]()}
               alt=""
-              quality="high"
             />
           </li>
         ))

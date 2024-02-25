@@ -20,8 +20,6 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
     class="size-full object-cover"
     src={images[`/src/assets/img/${place.slug}/thumb.jpg`]()}
     alt=""
-    loading="eager"
-    quality="high"
     transition:name={`thumb-${place.slug}`}
   />
   <div
